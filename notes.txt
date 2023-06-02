@@ -1,0 +1,37 @@
+MoCo v3. 
+We employ a contrastive-based self-supervised
+classification framework in the form of MoCo v3 - a simpler, more
+accurate and stable version of MoCo [15] as proposed by Chen et
+al [5]. Version 3 removes the memory queue used by MoCo and
+implements a symmetrized loss function. The model follows that of
+Chen et al. [5] with a ResNet-50 backbone, LARS optimizer, batch
+size of 4096, a learning rate of 0.3, a weight decay of 1.5e-6 and the
+temperature parameter set to 1. The momentum coefficient used to
+train the key autoencoder is set to 0.996
+
+Vanilla: 
+    Adam hyperparameters comes from Hu et al., ‘Unsupervised Learning for Cell-Level Visual Representation in Histopathology Images with Generative Adversarial Networks’.
+
+
+WGAN-GP (all from "Improved training of wasserstein GAN")
+    Generator
+        Adam - α = 0.0001, β1 = 0, β2 = 0.9
+        λ=10
+        n_crit = 10
+    Discriminator
+        "To resolve this, we simply omit batch normalization in the critic in our models, finding that they perform well without it." -> improved training of WGAN-GP
+    Overall
+        Adam learning rate = 0.0001 (can be 0.00005 like in "Cancer diagnosis using GAN...imbalanced data")
+
+StyleGAN
+
+
+Moco v3:
+    hyperparameters [based on "An empirical study of training self-supervised ViT]
+    ResNet-50
+    Batch = 4096
+    LARS Optimizer
+    lr = 0.3
+    wd = 1.5e-6
+    temp = 1.0
+    Fk momenum coefficient = 0.996 but increases to 1 with cosine schedule
