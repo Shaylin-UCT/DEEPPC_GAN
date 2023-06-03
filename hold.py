@@ -115,14 +115,16 @@ optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
 # ----------
-#  Training
-# ----------
-
-# ----------
 #  Create file for writing
 # ----------
 output = open("Performance.txt", "w")
 output.write("[Epoch] [Batch] [D loss] [G loss] \n")
+
+# ----------
+#  Training
+# ----------
+
+
 
 for epoch in range(opt.n_epochs):
     for i, (imgs, _) in enumerate(dataloader):

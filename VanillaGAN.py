@@ -19,7 +19,7 @@ import torch
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=400, help="number of epochs of training")
+parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
 parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate") #Check Values
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient") #Check Values
@@ -80,7 +80,6 @@ class Discriminator(nn.Module):
     def forward(self, img):
         img_flat = img.view(img.size(0), -1)
         validity = self.model(img_flat)
-
         return validity
 
 
@@ -97,7 +96,6 @@ if cuda:
     adversarial_loss.cuda()
 
 # Configure data loader
-#Replace with our dataset
 import Data_to_PyDataset
 converter = Data_to_PyDataset.DataPrep("Elbow", opt.img_size)
 data = converter.getData()
@@ -116,6 +114,12 @@ optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1,
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+
+# ----------
+#  Create file for writing
+# ----------
+output = open("Performance.txt", "w")
+output.write("[Epoch] [Batch] [D loss] [G loss] \n")
 
 # ----------
 #  Training

@@ -29,7 +29,7 @@ parser.add_argument("--b2", type=float, default=0.9, help="adam: decay of first 
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
 parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
 parser.add_argument("--img_size", type=int, default=28, help="size of each image dimension")
-parser.add_argument("--channels", type=int, default=1, help="number of image channels")
+parser.add_argument("--channels", type=int, default=3, help="number of image channels")
 parser.add_argument("--n_critic", type=int, default=5, help="number of training steps for discriminator per iter")
 parser.add_argument("--clip_value", type=float, default=0.01, help="lower and upper clip value for disc. weights")
 parser.add_argument("--sample_interval", type=int, default=400, help="interval betwen image samples")
@@ -80,7 +80,8 @@ class Discriminator(nn.Module):
         )
 
     def forward(self, img):
-        img_flat = img.view(img.shape[0], -1)
+        img_flat = img.view(img.shape[0], -1) 
+        #img_flat = img.view(img.size(0), -1)
         validity = self.model(img_flat)
         return validity
 
@@ -97,7 +98,16 @@ if cuda:
     discriminator.cuda()
 
 # Configure data loader
-os.makedirs("../../data/mnist", exist_ok=True)
+#os.makedirs("../../data/mnist", exist_ok=True)
+import Data_to_PyDataset
+converter = Data_to_PyDataset.DataPrep("Elbow", opt.img_size)
+data = converter.getData()
+dataloader = DataLoader(dataset=data, 
+                            batch_size=opt.batch_size, # how many samples per batch? MAKE OPT.BATCHSIZE
+                            shuffle=True) # shuffle the data?
+print("dataloader:", dataloader, "of size", len(dataloader))
+
+'''
 dataloader = torch.utils.data.DataLoader(
     datasets.MNIST(
         "../../data/mnist",
@@ -110,6 +120,8 @@ dataloader = torch.utils.data.DataLoader(
     batch_size=opt.batch_size,
     shuffle=True,
 )
+'''
+
 
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
@@ -150,7 +162,7 @@ for epoch in range(opt.n_epochs):
 
         # Configure input
         real_imgs = Variable(imgs.type(Tensor))
-
+        print("real_imgs.size:",real_imgs.size())
         # ---------------------
         #  Train Discriminator
         # ---------------------

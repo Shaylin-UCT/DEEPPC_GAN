@@ -40,31 +40,33 @@ class DataPrep():
         #Create new dataset:
         newData =  datasets.ImageFolder(root=data_path, transform=data_transform,target_transform=None)
         #print(f"Dataset consists of:\n{newData}")
-        
         #Return data to be used in a dataloader
         return newData
 
 
-
-def imshow(img):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-
 def main():
     from torch.utils.data import DataLoader
-    x = DataPrep("Elbow", 128)
+    x = DataPrep("Elbow", 28)
     hold = x.getData()
     dataloader = DataLoader(dataset=x.getData(), 
-                                batch_size=1, # how many samples per batch?
+                                batch_size=64, # how many samples per batch?
                                 num_workers=1, # how many subprocesses to use for data loading? (higher = more)
                                 shuffle=True) # shuffle the data?
     print(dataloader)
     print("len(dataloader):",len(dataloader))
     print("batch size:",dataloader.batch_size)
     print("sampler:", dataloader.sampler)
+
+    import torch
+    cuda = True if torch.cuda.is_available() else False
+
+    for i, (imgs, _) in enumerate(dataloader):
+        # Configure input
+        Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+        #real_imgs = Variable(imgs.type(Tensor))
+        hold = imgs.type(Tensor)
+        print("Type of \"hold\"", type(hold))
+        print("Hold.size:",hold.size())
 
 if __name__=="__main__":
     main()
