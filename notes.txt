@@ -23,6 +23,7 @@ WGAN-GP (all from "Improved training of wasserstein GAN")
     Overall
         Adam learning rate = 0.0001 (can be 0.00005 like in "Cancer diagnosis using GAN...imbalanced data")
 
+    Made channel default = 3 and batch size = 64. Everything else was kept constant
 StyleGAN
 
 
