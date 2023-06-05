@@ -112,6 +112,7 @@ dataloader = torch.utils.data.DataLoader(
     batch_size=opt.batch_size,
     shuffle=True,
 )
+
 '''
 import Data_to_PyDataset
 converter = Data_to_PyDataset.DataPrep("Elbow", opt.img_size)
@@ -122,6 +123,21 @@ dataloader = DataLoader(dataset=data,
                                 shuffle=True) # shuffle the data?
 print("dataloader:", dataloader, "of size", len(dataloader))
 '''
+
+
+#Plot some training images
+import matplotlib.pyplot as plt
+import torchvision.utils as vutils
+device = torch.device("cuda" if cuda else "cpu")
+real_batch = next(iter(dataloader))
+plt.figure(figsize=(8,8))
+plt.axis("off")
+plt.title("Training Images")
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
+plt.show()
+plt.savefig("test")
+
+
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
