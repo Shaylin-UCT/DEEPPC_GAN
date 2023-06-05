@@ -2,7 +2,10 @@
 -----------------------------------------------------------------------
 Implementations of different GAN metrics using pytorch unless specified
 -----------------------------------------------------------------------
-
+'''
+#Libraries
+from pytorch_fid import fid_score, inception #FID
+'''
                             --- FID ---
 
 For FID, run command: python -m pytorch_fid <imageset1> <imageset2>
@@ -18,21 +21,20 @@ paths = [...] -> list of file paths
                                               device=device, dims = dims)
     print("FID", fid)
 '''
-#Libraries
-#FID library:
-from pytorch_fid import fid_score, inception
 
-
-
-def main():
-    paths = ["DeleteThis\\test1", "DeleteThis\\test2"]
+def calculateFID(dataset1, dataset2):
+    paths = [dataset1, dataset2]
     batch_size = 50
     device = "cpu"
     dims = 2048
     num_workers = 8 
-    fid = fid_score.calculate_fid_given_paths(paths=paths, batch_size=batch_size, 
-                                              device=device, dims = dims)
+    fid = fid_score.calculate_fid_given_paths(paths=paths, batch_size=batch_size, device=device, dims = dims)
+    return fid
+
+def main():
+    fid = calculateFID("DeleteThis\\test1", "DeleteThis\\test2")
     print("FID", fid)
 
 if __name__=="__main__":
     main()
+
