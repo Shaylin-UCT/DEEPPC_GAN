@@ -33,6 +33,7 @@ parser.add_argument("--channels", type=int, default=3, help="number of image cha
 parser.add_argument("--n_critic", type=int, default=5, help="number of training steps for discriminator per iter")
 parser.add_argument("--clip_value", type=float, default=0.01, help="lower and upper clip value for disc. weights")
 parser.add_argument("--sample_interval", type=int, default=400, help="interval betwen image samples")
+parser.add_argument("--dataset", type=str, default="Elbow", help="Dataset to use [Elbow, Neck_Unlocalized_GAN, Neck_Unlocalized_Self]")
 opt = parser.parse_args()
 print(opt)
 
@@ -100,7 +101,7 @@ if cuda:
 # Configure data loader
 #os.makedirs("../../data/mnist", exist_ok=True)
 import Data_to_PyDataset
-converter = Data_to_PyDataset.DataPrep("Elbow", opt.img_size)
+converter = Data_to_PyDataset.DataPrep(opt.dataset, opt.img_size)
 data = converter.getData()
 dataloader = DataLoader(dataset=data, 
                             batch_size=opt.batch_size, # how many samples per batch? MAKE OPT.BATCHSIZE
