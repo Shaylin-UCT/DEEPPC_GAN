@@ -1,3 +1,5 @@
+'''Original VanillaGAN implementation'''
+
 import argparse
 import os
 import numpy as np
@@ -13,6 +15,8 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
+
+from pytorch_fid import fid_score, inception
 
 os.makedirs("images", exist_ok=True)
 
@@ -94,6 +98,7 @@ if cuda:
     adversarial_loss.cuda()
 
 # Configure data loader
+
 os.makedirs("../../data/mnist", exist_ok=True)
 dataloader = torch.utils.data.DataLoader(
     datasets.MNIST(
@@ -107,7 +112,16 @@ dataloader = torch.utils.data.DataLoader(
     batch_size=opt.batch_size,
     shuffle=True,
 )
+'''
+import Data_to_PyDataset
+converter = Data_to_PyDataset.DataPrep("Elbow", opt.img_size)
+data = converter.getData()
 
+dataloader = DataLoader(dataset=data, 
+                                batch_size=opt.batch_size, # how many samples per batch? MAKE OPT.BATCHSIZE
+                                shuffle=True) # shuffle the data?
+print("dataloader:", dataloader, "of size", len(dataloader))
+'''
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
@@ -168,6 +182,8 @@ for epoch in range(opt.n_epochs):
         d_loss.backward()
         optimizer_D.step()
 
+        
+
         print(
             "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
             % (epoch, opt.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
@@ -182,3 +198,4 @@ for epoch in range(opt.n_epochs):
         #print("batches_done", batches_done)
         if batches_done % opt.sample_interval == 0:
             save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
+           

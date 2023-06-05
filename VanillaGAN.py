@@ -16,6 +16,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
@@ -164,6 +165,7 @@ for epoch in range(opt.n_epochs):
 
         d_loss.backward()
         optimizer_D.step()
+
 
         print(
             "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"

@@ -1,4 +1,7 @@
-#https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/wgan_gp/wgan_gp.py
+'''
+Official WGANGP Implementation"
+https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/wgan_gp/wgan_gp.py
+'''
 
 import argparse
 import os
