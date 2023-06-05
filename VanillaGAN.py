@@ -111,7 +111,7 @@ data = converter.getData()
 dataloader = DataLoader(dataset=data, 
                                 batch_size=opt.batch_size, # how many samples per batch? MAKE OPT.BATCHSIZE
                                 shuffle=True) # shuffle the data?
-print("dataloader:", dataloader, "of size", len(dataloader))
+#print("dataloader:", dataloader, "of size", len(dataloader))
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
@@ -173,6 +173,5 @@ for epoch in range(opt.n_epochs):
         )
 
         batches_done = epoch * len(dataloader) + i
-        print("batches_done", batches_done)
         if batches_done % opt.sample_interval == 0:
             save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)

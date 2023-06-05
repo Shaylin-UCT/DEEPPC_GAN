@@ -105,7 +105,7 @@ data = converter.getData()
 dataloader = DataLoader(dataset=data, 
                             batch_size=opt.batch_size, # how many samples per batch? MAKE OPT.BATCHSIZE
                             shuffle=True) # shuffle the data?
-print("dataloader:", dataloader, "of size", len(dataloader))
+#print("dataloader:", dataloader, "of size", len(dataloader))
 
 '''
 dataloader = torch.utils.data.DataLoader(
@@ -162,7 +162,7 @@ for epoch in range(opt.n_epochs):
 
         # Configure input
         real_imgs = Variable(imgs.type(Tensor))
-        print("real_imgs.size:",real_imgs.size())
+        #print("real_imgs.size:",real_imgs.size())
         # ---------------------
         #  Train Discriminator
         # ---------------------

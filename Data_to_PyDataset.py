@@ -19,11 +19,12 @@ class DataPrep():
         data_path = pathlib.Path("./ImagesforResearch")
         #data_path = pathlib.Path("C:/Users/shayl/OneDrive/Documents/Honors/Research/CodeBase/TrainingData")
         image_path = data_path / self.element
-        print(image_path)
+        #print(image_path)
         if image_path.is_dir(): #Check if directory exists
             print(f"{image_path} directory exists.")
+            pass
         else:
-            print("An error has occured")
+            print(f"{image_path} directory DOES NOT exist.")
         data_transform = transforms.Compose(
             [
             # Resize the images to 64x64
