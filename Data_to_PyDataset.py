@@ -63,11 +63,15 @@ def main():
 
     for i, (imgs, _) in enumerate(dataloader):
         # Configure input
-        Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+        #Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
         #real_imgs = Variable(imgs.type(Tensor))
-        hold = imgs.type(Tensor)
-        print("Type of \"hold\"", type(hold))
-        print("Hold.size:",hold.size())
+        #hold = imgs.type(Tensor)
+        #print("Type of \"hold\"", type(hold))
+        #print("Hold.size:",hold.size())
+        print("Batch:", i)
+        print("BatchSize:",imgs.size())
+        print("BatchLabel:", _, _.size()) #The label for the image. It is assigned a value in our case
+        #break #Just done to print the first batch only
 
 if __name__=="__main__":
     main()
