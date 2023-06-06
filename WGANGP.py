@@ -213,6 +213,6 @@ for epoch in range(opt.n_epochs):
             )
 
             if batches_done % opt.sample_interval == 0:
-                save_image(fake_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
+                save_image(fake_imgs.data[:25], "GeneratedImages/WGANGP/%d.png" % batches_done, nrow=5, normalize=True)
 
             batches_done += opt.n_critic
