@@ -84,6 +84,9 @@ class Discriminator(nn.Module):
 
         return validity
 
+#Some arrays for metrics (mainly graphs)
+G_losses = []
+D_losses = []
 
 # Loss function
 adversarial_loss = torch.nn.BCELoss() #uses Binary Cross Entropy Closs (could use BCEwithLogits loss) which combines softmax and BCE
@@ -113,17 +116,20 @@ dataloader = DataLoader(dataset=data,
                                 shuffle=True) # shuffle the data?
 #print("dataloader:", dataloader, "of size", len(dataloader))
 
-#Plot some training images
-import matplotlib.pyplot as plt
-import torchvision.utils as vutils
-device = torch.device("cuda" if cuda else "cpu")
-real_batch = next(iter(dataloader))
-plt.figure(figsize=(8,8)) #The size of the plot
-plt.axis("off")
-plt.title("Training Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:32], padding=2, normalize=True).cpu(),(1,2,0)))
-plt.show()
-plt.savefig("test")
+def plotExampleTrainingData(dataloader):
+    '''Plots training images'''
+    import matplotlib.pyplot as plt
+    import torchvision.utils as vutils
+    device = torch.device("cuda" if cuda else "cpu")
+    real_batch = next(iter(dataloader))
+    plt.figure(figsize=(8,8)) #The size of the plot
+    plt.axis("off")
+    plt.title("Training Images")
+    plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:32], padding=2, normalize=True).cpu(),(1,2,0)))
+    plt.savefig("GeneratedImages\VanillaGAN\TrainingImagesVanillaGAN.png")
+    
+
+plotExampleTrainingData(dataloader=dataloader)
 
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
@@ -134,6 +140,17 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 # ----------
 #  Training
 # ----------
+
+def visualizeLosses(G_losses, D_losses):
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10,5))
+    plt.title("Generator and Discriminator Loss During Training")
+    plt.plot(G_losses,label="G")
+    plt.plot(D_losses,label="D")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
 
 for epoch in range(opt.n_epochs):
     for i, (imgs, _) in enumerate(dataloader):
@@ -185,6 +202,11 @@ for epoch in range(opt.n_epochs):
             % (epoch, opt.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
         )
 
+        #Add stats to lists
+        G_losses.append(g_loss.item())
+        D_losses.append(d_loss.item())
+        
         batches_done = epoch * len(dataloader) + i
         if batches_done % opt.sample_interval == 0:
-            save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
+            save_image(gen_imgs.data[:25], "GeneratedImages/VanillaGAN/%d.png" % batches_done, nrow=5, normalize=True)
+visualizeLosses(G_losses=G_losses, D_losses=D_losses)

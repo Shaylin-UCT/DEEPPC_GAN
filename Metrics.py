@@ -31,6 +31,10 @@ def calculateFID(dataset1, dataset2):
     fid = fid_score.calculate_fid_given_paths(paths=paths, batch_size=batch_size, device=device, dims = dims)
     return fid
 
+'''
+                            --- GAN-{Test, Train} ---
+
+'''
 def main():
     fid = calculateFID("DeleteThis\\test1", "DeleteThis\\test2")
     print("FID", fid)

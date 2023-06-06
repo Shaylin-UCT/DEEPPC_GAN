@@ -86,6 +86,9 @@ class Discriminator(nn.Module):
         validity = self.model(img_flat)
         return validity
 
+#Some arrays for metrics (mainly graphs)
+G_losses = []
+D_losses = []
 
 # Loss weight for gradient penalty (gp coefficient)
 lambda_gp = 10
@@ -130,6 +133,28 @@ optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt
 
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
+def plotExampleTrainingData(dataloader):
+    '''Plots training images'''
+    import matplotlib.pyplot as plt
+    import torchvision.utils as vutils
+    device = torch.device("cuda" if cuda else "cpu")
+    real_batch = next(iter(dataloader))
+    plt.figure(figsize=(8,8)) #The size of the plot
+    plt.axis("off")
+    plt.title("Training Images")
+    plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:32], padding=2, normalize=True).cpu(),(1,2,0)))
+    plt.savefig("GeneratedImages\VanillaGAN\TrainingImagesVanillaGAN.png")
+
+def visualizeLosses(G_losses, D_losses):
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10,5))
+    plt.title("Generator and Discriminator Loss During Training")
+    plt.plot(G_losses,label="G")
+    plt.plot(D_losses,label="D")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
 
 def compute_gradient_penalty(D, real_samples, fake_samples):
     """Calculates the gradient penalty loss for WGAN GP"""
@@ -207,6 +232,9 @@ for epoch in range(opt.n_epochs):
             g_loss.backward()
             optimizer_G.step()
 
+            G_losses.append(g_loss.item())
+            D_losses.append(d_loss.item())
+
             print(
                 "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
                 % (epoch, opt.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
@@ -216,3 +244,4 @@ for epoch in range(opt.n_epochs):
                 save_image(fake_imgs.data[:25], "GeneratedImages/WGANGP/%d.png" % batches_done, nrow=5, normalize=True)
 
             batches_done += opt.n_critic
+visualizeLosses(G_losses=G_losses, D_losses=D_losses)
