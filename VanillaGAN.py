@@ -115,7 +115,7 @@ dataloader = DataLoader(dataset=data,
                                 batch_size=opt.batch_size, # how many samples per batch? MAKE OPT.BATCHSIZE
                                 shuffle=True) # shuffle the data?
 #print("dataloader:", dataloader, "of size", len(dataloader))
-
+'''
 def plotExampleTrainingData(dataloader):
     #Plots training images
     import matplotlib.pyplot as plt
@@ -133,7 +133,7 @@ def plotExampleTrainingData(dataloader):
     plt.savefig("GeneratedImages\VanillaGAN\TrainingImagesVanillaGAN.png")
 
 plotExampleTrainingData(dataloader=dataloader)
-
+'''
 
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
