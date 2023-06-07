@@ -26,7 +26,7 @@ parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first 
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient") #Check Values
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation") #Depends on Machine
 parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
-parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension") #E.g. a 64x64 image would be 64 -> assumes square images
+parser.add_argument("--img_size", type=int, default=128, help="size of each image dimension") #E.g. a 64x64 image would be 64 -> assumes square images
 parser.add_argument("--channels", type=int, default=3, help="number of image channels")
 parser.add_argument("--sample_interval", type=int, default=400, help="interval betwen image samples")
 parser.add_argument("--dataset", type=str, default="Elbow", help="Dataset to use [Elbow, Neck_Unlocalized_GAN, Neck_Unlocalized_Self]")
@@ -117,19 +117,23 @@ dataloader = DataLoader(dataset=data,
 #print("dataloader:", dataloader, "of size", len(dataloader))
 
 def plotExampleTrainingData(dataloader):
-    '''Plots training images'''
+    #Plots training images
     import matplotlib.pyplot as plt
     import torchvision.utils as vutils
     device = torch.device("cuda" if cuda else "cpu")
-    real_batch = next(iter(dataloader))
+    #real_batch = next(iter(dataloader))
+    items = []
+    for i in range(32):
+        items.append(next(iter(dataloader)))
+    real_batch = items
     plt.figure(figsize=(8,8)) #The size of the plot
     plt.axis("off")
     plt.title("Training Images")
     plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:32], padding=2, normalize=True).cpu(),(1,2,0)))
     plt.savefig("GeneratedImages\VanillaGAN\TrainingImagesVanillaGAN.png")
-    
 
 plotExampleTrainingData(dataloader=dataloader)
+
 
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
@@ -153,7 +157,8 @@ def visualizeLosses(G_losses, D_losses):
     plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
 
 for epoch in range(opt.n_epochs):
-    for i, (imgs, _) in enumerate(dataloader):
+    #for i, (imgs, _) in enumerate(dataloader):
+    for i, imgs in enumerate(dataloader):
         #print("Start training loop:", i)
         # Adversarial ground truths
         valid = Variable(Tensor(imgs.size(0), 1).fill_(1.0), requires_grad=False)
