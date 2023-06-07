@@ -15,15 +15,18 @@ class DataPrep():
         import torch
         from torch.utils.data import DataLoader
         from torchvision import datasets, transforms
+        import os
 
         data_path = pathlib.Path("./ImagesforResearch")
         #data_path = pathlib.Path("C:/Users/shayl/OneDrive/Documents/Honors/Research/CodeBase/TrainingData")
         image_path = data_path / self.element
         #print(image_path)
         if image_path.is_dir(): #Check if directory exists
+            print("Currently working in:", os.getcwd())
             print(f"{image_path} directory exists.")
             pass
         else:
+            print("Currently working in:", os.getcwd())
             print(f"{image_path} directory DOES NOT exist.")
         data_transform = transforms.Compose(
             [
