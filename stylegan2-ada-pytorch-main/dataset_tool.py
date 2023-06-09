@@ -51,7 +51,6 @@ def is_image_ext(fname: Union[str, Path]) -> bool:
 
 def open_image_folder(source_dir, *, max_images: Optional[int]):
     input_images = [str(f) for f in sorted(Path(source_dir).rglob('*')) if is_image_ext(f) and os.path.isfile(f)]
-
     # Load labels.
     labels = {}
     meta_fname = os.path.join(source_dir, 'dataset.json')
@@ -69,7 +68,8 @@ def open_image_folder(source_dir, *, max_images: Optional[int]):
         for idx, fname in enumerate(input_images):
             arch_fname = os.path.relpath(fname, source_dir)
             arch_fname = arch_fname.replace('\\', '/')
-            img = np.array(PIL.Image.open(fname))
+            img = PIL.Image.open(fname)
+            img = np.array(img.convert("L"))
             yield dict(img=img, label=labels.get(arch_fname))
             if idx >= max_idx-1:
                 break
@@ -393,7 +393,7 @@ def convert_dataset(
 
     labels = []
     for idx, image in tqdm(enumerate(input_iter), total=num_files):
-        idx_str = f'{idx:08d}'
+        idx_str = f'{idx:08d}' #the iteration number
         archive_fname = f'{idx_str[:5]}/img{idx_str}.png'
 
         # Apply crop and resize.
@@ -405,6 +405,9 @@ def convert_dataset(
 
         # Error check to require uniform image attributes across
         # the whole dataset.
+        #print("IDX:", idx)
+        #print("img.shape:", img.shape)
+        #print("Dimensions per image:", img.ndim)
         channels = img.shape[2] if img.ndim == 3 else 1
         cur_image_attrs = {
             'width': img.shape[1],
@@ -422,7 +425,7 @@ def convert_dataset(
             if width != 2 ** int(np.floor(np.log2(width))):
                 error('Image width/height after scale and crop are required to be power-of-two')
         elif dataset_attrs != cur_image_attrs:
-            err = [f'  dataset {k}/cur image {k}: {dataset_attrs[k]}/{cur_image_attrs[k]}' for k in dataset_attrs.keys()]
+            err = [f'  dataset {k} / cur image {k}: {dataset_attrs[k]}/{cur_image_attrs[k]}' for k in dataset_attrs.keys()]
             error(f'Image {archive_fname} attributes must be equal across all images of the dataset.  Got:\n' + '\n'.join(err))
 
         # Save the image as an uncompressed PNG.
