@@ -111,30 +111,15 @@ dataloader = DataLoader(dataset=data,
                             shuffle=True) # shuffle the data?
 #print("dataloader:", dataloader, "of size", len(dataloader))
 
-'''
-dataloader = torch.utils.data.DataLoader(
-    datasets.MNIST(
-        "../../data/mnist",
-        train=True,
-        download=True,
-        transform=transforms.Compose(
-            [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
-        ),
-    ),
-    batch_size=opt.batch_size,
-    shuffle=True,
-)
-'''
-
 
 # Optimizers
 optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-
+'''
 def plotExampleTrainingData(dataloader):
-    '''Plots training images'''
+    #Plots training images
     import matplotlib.pyplot as plt
     import torchvision.utils as vutils
     device = torch.device("cuda" if cuda else "cpu")
@@ -144,7 +129,7 @@ def plotExampleTrainingData(dataloader):
     plt.title("Training Images")
     plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:32], padding=2, normalize=True).cpu(),(1,2,0)))
     plt.savefig("GeneratedImages\VanillaGAN\TrainingImagesVanillaGAN.png")
-
+'''
 def visualizeLosses(G_losses, D_losses):
     import matplotlib.pyplot as plt
     plt.figure(figsize=(10,5))
@@ -154,7 +139,11 @@ def visualizeLosses(G_losses, D_losses):
     plt.xlabel("iterations")
     plt.ylabel("Loss")
     plt.legend()
-    plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
+    import pathlib
+    data_path = pathlib.Path("./GANMetrics/WGANGP")
+    data_path = data_path / ("LossesWGANGP" + opt.dataset)
+    #plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
+    plt.savefig(data_path)
 
 def compute_gradient_penalty(D, real_samples, fake_samples):
     """Calculates the gradient penalty loss for WGAN GP"""
@@ -184,7 +173,8 @@ def compute_gradient_penalty(D, real_samples, fake_samples):
 
 batches_done = 0
 for epoch in range(opt.n_epochs):
-    for i, (imgs, _) in enumerate(dataloader):
+    #for i, (imgs, _) in enumerate(dataloader):
+    for i, imgs in enumerate(dataloader):
 
         # Configure input
         real_imgs = Variable(imgs.type(Tensor))
@@ -241,7 +231,9 @@ for epoch in range(opt.n_epochs):
             )
 
             if batches_done % opt.sample_interval == 0:
-                save_image(fake_imgs.data[:25], "GeneratedImages/WGANGP/%d.png" % batches_done, nrow=5, normalize=True)
+                save_image(fake_imgs.data[:25], f"GeneratedImages/WGANGP/{opt.dataset}/%d.png" % batches_done, nrow=5, normalize=True)
 
             batches_done += opt.n_critic
 visualizeLosses(G_losses=G_losses, D_losses=D_losses)
+print("WGANGP Discriminator:", D_losses)
+print("WGANGP Generator:", G_losses)

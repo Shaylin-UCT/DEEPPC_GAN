@@ -16,12 +16,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-from pytorch_fid import fid_score, inception
-
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
+parser.add_argument("--n_epochs", type=int, default=1, help="number of epochs of training")
 parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
@@ -31,6 +29,7 @@ parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality 
 parser.add_argument("--img_size", type=int, default=28, help="size of each image dimension")
 parser.add_argument("--channels", type=int, default=1, help="number of image channels")
 parser.add_argument("--sample_interval", type=int, default=400, help="interval betwen image samples")
+parser.add_argument("--dataset", type=str, default="Elbow", help="Dataset to use [Elbow, Neck_Unlocalized_GAN, Neck_Unlocalized_Self]")
 opt = parser.parse_args()
 print(opt)
 
@@ -84,6 +83,9 @@ class Discriminator(nn.Module):
 
         return validity
 
+#Some arrays for metrics (mainly graphs)
+G_losses = []
+D_losses = []
 
 # Loss function
 adversarial_loss = torch.nn.BCELoss()
@@ -134,8 +136,9 @@ plt.figure(figsize=(8,8))
 plt.axis("off")
 plt.title("Training Images")
 plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
-plt.show()
 plt.savefig("test")
+#plt.show()
+
 
 
 # Optimizers
@@ -149,6 +152,24 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 # ----------
 output = open("Performance.txt", "w")
 output.write("[Epoch] [Batch] [D loss] [G loss] \n")
+
+# ----------
+#  Code for visualising losses
+# ----------
+def visualizeLosses(G_losses, D_losses):
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10,5))
+    plt.title("Generator and Discriminator Loss During Training")
+    plt.plot(G_losses,label="G")
+    plt.plot(D_losses,label="D")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    import pathlib
+    data_path = pathlib.Path("./GeneratedImages/VanillaGAN")
+    data_path = data_path / ("LossesVanilleGAN" + opt.dataset)
+    #plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
+    plt.savefig(data_path)
 
 # ----------
 #  Training
@@ -209,9 +230,14 @@ for epoch in range(opt.n_epochs):
             % (epoch, i, d_loss.item(), g_loss.item())
         )
 
+        #Add stats to lists
+        G_losses.append(g_loss.item())
+        D_losses.append(d_loss.item())
+        
 
         batches_done = epoch * len(dataloader) + i
         #print("batches_done", batches_done)
         if batches_done % opt.sample_interval == 0:
-            save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
+            save_image(gen_imgs.data[:25], f"GeneratedImages/VanillaGAN/{opt.dataset}/%d.png" % batches_done, nrow=5, normalize=True)
            
+visualizeLosses(G_losses=G_losses, D_losses=D_losses)

@@ -154,7 +154,11 @@ def visualizeLosses(G_losses, D_losses):
     plt.xlabel("iterations")
     plt.ylabel("Loss")
     plt.legend()
-    plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
+    import pathlib
+    data_path = pathlib.Path("./GANMetrics/VanillaGAN")
+    data_path = data_path / ("LossesVanilleGAN" + opt.dataset)
+    #plt.savefig("GeneratedImages\VanillaGAN\LossesVanillaGAN")
+    plt.savefig(data_path)
 
 for epoch in range(opt.n_epochs):
     #for i, (imgs, _) in enumerate(dataloader):
@@ -213,5 +217,5 @@ for epoch in range(opt.n_epochs):
         
         batches_done = epoch * len(dataloader) + i
         if batches_done % opt.sample_interval == 0:
-            save_image(gen_imgs.data[:25], "GeneratedImages/VanillaGAN/%d.png" % batches_done, nrow=5, normalize=True)
+            save_image(gen_imgs.data[:25], f"GeneratedImages/VanillaGAN/{opt.dataset}/%d.png" % batches_done, nrow=5, normalize=True)
 visualizeLosses(G_losses=G_losses, D_losses=D_losses)

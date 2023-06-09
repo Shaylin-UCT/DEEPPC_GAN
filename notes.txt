@@ -25,9 +25,8 @@ WGAN-GP (all from "Improved training of wasserstein GAN")
 
     Made channel default = 3 and batch size = 64. Everything else was kept constant
 StyleGAN
-
-
 Moco v3:
+
     hyperparameters [based on "An empirical study of training self-supervised ViT]
     ResNet-50
     Batch = 4096
@@ -36,3 +35,30 @@ Moco v3:
     wd = 1.5e-6
     temp = 1.0
     Fk momenum coefficient = 0.996 but increases to 1 with cosine schedule
+    # Running MoCo v3 
+    ## ResNet-50, 300-epoch training:
+        Needs 2 nodes, On the first use:
+
+        python main_moco.py \
+        --lr=.3 --epochs=300 \
+        --moco-m-cos --crop-min=.2 \
+        --dist-url 'tcp://[your first node address]:[specified port]' \
+        --multiprocessing-distributed --world-size 2 --rank 0 \
+        [your imagenet-folder with train and val folders]
+
+        On the second node, do the same but with "--rank 1" added in 
+
+    ## ResNet-50, Linear Classification
+        python main_lincls.py \
+    --dist-url 'tcp://localhost:10001' \
+    --multiprocessing-distributed --world-size 1 --rank 0 \
+    --pretrained [your checkpoint path]/[your checkpoint file].pth.tar \
+    [your imagenet-folder with train and val folders]
+
+    ## Pretrained (on ImageNet) is available on Git (https://github.com/facebookresearch/moco-v3/blob/main/CONFIG.md) but
+    ## This won't work on medical datasets -> need pretraining on medical database
+Dataloader:
+    for i, (imgs, _) in enumerate(dataloader):
+    i -> batch number
+    imgs -> actual image
+    _ -> the label of the image
